@@ -38,7 +38,7 @@ class HPSv1Model(BaseModel):
         if not isinstance(captions, list) or not all(isinstance(c, str) for c in captions):
             raise TypeError("Expected 'captions' to be a list of strings.")
         if inputs.shape[0] != len(captions):
-            raise ValueError("Number of images and captions must match.")
+            raise ValueError("Number of 'inputs' and 'captions' must match.")
         
         try:
             with torch.no_grad():
