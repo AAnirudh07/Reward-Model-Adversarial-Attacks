@@ -49,7 +49,9 @@ class HPSv1Model(BaseModel):
                 image_features = image_features / image_features.norm(dim=-1, keepdim=True)
                 text_features = text_features / text_features.norm(dim=-1, keepdim=True)
 
-                similarity_scores = (image_features @ text_features.T).diag().tolist()
-            return similarity_scores
+                # Convert cosine similarity scores to percentages as in the original paper
+                similarity_scores = (image_features @ text_features.T).diag() * 100
+                
+            return similarity_scores.tolist()
         except Exception as e:
             raise RuntimeError(f"Inference failed: {e}.")
