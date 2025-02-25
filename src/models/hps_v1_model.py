@@ -1,8 +1,8 @@
 import clip
 import torch
-from PIL import Image
 from typing import List
 from models.base_model import BaseModel
+from models.error import ModelLoadingError, InferenceError
 
 class HPSv1Model(BaseModel):
     def __init__(self, model_path: str):
@@ -20,21 +20,22 @@ class HPSv1Model(BaseModel):
             checkpoint = torch.load(self.model_path)
 
             if "state_dict" not in checkpoint:
-                raise KeyError("Checkpoint does not contain 'state_dict'.")
+                raise ModelLoadingError("Checkpoint does not contain 'state_dict'.")
             
             self.model.load_state_dict(checkpoint["state_dict"])
 
-        except FileNotFoundError:
-            raise FileNotFoundError(f"Model checkpoint not found at '{self.model_path}'.")
+        except FileNotFoundError as e:
+            raise ModelLoadingError(f"Model checkpoint not found at '{self.model_path}'.") from e
         except Exception as e:
-            raise RuntimeError(f"Error loading model: {e}.")
+            raise ModelLoadingError(f"Error loading model: {e}") from e
 
     def inference(self, inputs: torch.Tensor, captions: List[str]) -> List[float]:
         """
-        Runs inference on a batch of images and corresponding captions. Return a batch of reward scores.
+        Runs inference on a batch of images and corresponding captions.
+        Returns a batch of reward scores.
         """
         if not isinstance(inputs, torch.Tensor):
-            raise TypeError("Expected 'inputs' to be a of type torch.Tensor (i.e. images).")
+            raise TypeError("Expected 'inputs' to be of type torch.Tensor (i.e. images).")
         if not isinstance(captions, list) or not all(isinstance(c, str) for c in captions):
             raise TypeError("Expected 'captions' to be a list of strings.")
         if inputs.shape[0] != len(captions):
@@ -54,4 +55,4 @@ class HPSv1Model(BaseModel):
                 
             return similarity_scores.tolist()
         except Exception as e:
-            raise RuntimeError(f"Inference failed: {e}.")
+            raise InferenceError(f"Inference failed: {e}") from e
