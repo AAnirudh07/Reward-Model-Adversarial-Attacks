@@ -8,11 +8,14 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 
-# HPS dependencies
+# HPS Dependencies
 ftfy = "^6.3.1"
 tqdm = "^4.67.1"
 regex = "^2024.11.6"
 clip = { git = "https://github.com/openai/CLIP", branch = "main" }
+
+# Target Model Dependencies 
+diffusers = {extras = ["torch"], version = "^0.32.2"}
 
 torchattacks = "3.5.1"
 
