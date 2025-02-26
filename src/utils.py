@@ -1,7 +1,7 @@
 import gc
 import torch
 
-def clear_cuda_memory_and_force_gc(force=False):
+def clear_cuda_memory_and_force_gc(force: bool = False):
     """
     Clears the CUDA memory cache and forces garbage collection if the allocated memory
     exceeds a certain threshold or if explicitly forced.
