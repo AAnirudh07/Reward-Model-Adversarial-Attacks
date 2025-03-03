@@ -9,3 +9,5 @@ class FluxDiffusionModel(BaseDiffusionModel):
         super().__init__(model_path, offload_to_cpu, resolution, **kwargs)
         
         self.diffusion_pipeline = FluxDiffusionModel
+
+        self.load_model()

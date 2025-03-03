@@ -6,3 +6,5 @@ class VQDiffusionModel(BaseDiffusionModel):
         super().__init__(model_path)
         
         self.diffusion_pipeline = VQDiffusionPipeline
+
+        self.load_model()
