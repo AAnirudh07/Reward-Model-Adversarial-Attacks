@@ -17,11 +17,13 @@ class BaseDiffusionModel(BaseModel):
         self.offload_to_cpu = offload_to_cpu
         self.resolution = resolution
         self.kwargs = kwargs
-
-        # Override the DiffusionPipeline class if needed in the subclasses
-        self.diffusion_pipeline = DiffusionPipeline
-
+        
+        self.diffusion_pipeline = self._get_diffusion_pipeline()
         self.load_model()
+
+    def _get_diffusion_pipeline(self):
+        """ Subclasses should override this to return the correct pipeline. """
+        return DiffusionPipeline
 
     def load_model(self):
         try:
@@ -33,8 +35,10 @@ class BaseDiffusionModel(BaseModel):
                 self.model.enable_model_cpu_offload()
 
         except MemoryError as e:
-            if hasattr(self, "diffusion_pipeline"):
-                del self.diffusion_pipeline
+            if hasattr(self, "model"):
+                del self.model
+                torch.cuda.empty_cache()
+            raise ModelLoadingError(f"Memory error occurred while loading the model. Consider using a smaller model: {e}")
         except FileNotFoundError as e:
             raise ModelLoadingError(f"Model checkpoint not found at '{self.model_path}'.") from e
         except Exception as e:
@@ -56,13 +60,13 @@ class BaseDiffusionModel(BaseModel):
                 torch.Generator(self.device).manual_seed(self.seed) for _ in range(len(inputs))
             ]
             if self.resolution:
-                images = self.diffusion_pipeline(
+                images = self.model(
                     prompt=inputs, generator=generators,
                     height=self.resolution, width=self.resolution # use 1:1 aspect ratio
                 ).images
                 return images
             else:
-                images = self.diffusion_pipeline(
+                images = self.model(
                     prompt=inputs, generator=generators,
                 ).images
                 return images
