@@ -7,7 +7,6 @@ class FluxDiffusionModel(BaseDiffusionModel):
         if "torch_dtype" not in kwargs:
             kwargs["torch_dtype"] = torch.float16        
         super().__init__(model_path, offload_to_cpu, resolution, **kwargs)
-        
-        self.diffusion_pipeline = FluxDiffusionModel
 
-        self.load_model()
+    def _get_diffusion_pipeline(self):
+        return FluxPipeline

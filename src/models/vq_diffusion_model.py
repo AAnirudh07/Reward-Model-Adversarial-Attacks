@@ -4,7 +4,6 @@ from diffusers import VQDiffusionPipeline
 class VQDiffusionModel(BaseDiffusionModel):
     def __init__(self, model_path: str):
         super().__init__(model_path)
-        
-        self.diffusion_pipeline = VQDiffusionPipeline
 
-        self.load_model()
+    def _get_diffusion_pipeline(self):
+        return VQDiffusionPipeline
