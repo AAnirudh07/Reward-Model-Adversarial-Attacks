@@ -42,7 +42,7 @@ class BaseDiffusionModel(BaseModel):
         except FileNotFoundError as e:
             raise ModelLoadingError(f"Model checkpoint not found at '{self.model_path}'.") from e
         except Exception as e:
-            raise ModelLoadingError(f"Failed to load VQDiffusion model: {e}") from e
+            raise ModelLoadingError(f"Failed to load diffusion model: {e}") from e
 
     def inference(
         self, inputs: List[str], captions: Optional[List[str]] = None
