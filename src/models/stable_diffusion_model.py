@@ -3,7 +3,6 @@ import torch
 
 from diffusers import DiffusionPipeline, StableDiffusionPipeline, StableDiffusion3Pipeline  
 
-from models.error import ModelLoadingError
 from models.base_diffusion_model import BaseDiffusionModel
 
 class StableDiffusionModel(BaseDiffusionModel):
@@ -31,6 +30,6 @@ class StableDiffusionModel(BaseDiffusionModel):
         elif re.search(r'(stable-diffusion-3|v-?3)', version_tag):
             return StableDiffusion3Pipeline
         else:
-            raise ModelLoadingError(
+            raise ValueError(
                 "Model path must contain one of: 'stable-diffusion-1', 'stable-diffusion-2', or 'stable-diffusion-3'."
             )
