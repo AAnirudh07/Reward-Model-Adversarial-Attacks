@@ -4,7 +4,7 @@ import PIL
 from torch.utils.data import Dataset
 
 from datasets.error import DatasetFormatError
-class ImageTextDataset(Dataset):
+class ImagePromptDataset(Dataset):
     def __init__(self, image_list: List[PIL.Image], prompt_list: List[Tuple[str, str]], transforms: callable):
         """
         Args:
