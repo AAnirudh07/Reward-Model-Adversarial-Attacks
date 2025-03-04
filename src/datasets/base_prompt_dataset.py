@@ -52,3 +52,7 @@ class BasePromptDataset(Dataset, ABC):
 
     def __getitem__(self, idx):
         return self.samples[idx]
+
+    def num_categories(self) -> int:
+        """Returns the number of unique categories in the dataset."""
+        return len(self.data)
