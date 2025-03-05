@@ -41,7 +41,7 @@ class FGSMRewardModel(BaseAttack):
                 batch_images = images[i: i + self.batch_size]
                 batch_labels = labels[i: i + self.batch_size]
 
-                total_loss += -self.model.inference(batch_images, batch_labels).sum()
+                total_loss += -sum(self.model.inference(batch_images, batch_labels))
                 total_samples += batch_images.shape[0]
 
             global_loss = total_loss / total_samples
