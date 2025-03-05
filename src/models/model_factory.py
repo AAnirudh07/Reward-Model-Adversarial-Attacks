@@ -7,8 +7,6 @@ class ModelFactory:
     @staticmethod
     def create_model(
         model_type: str, model_path: str,
-        offload_to_cpu: bool = False,
-        resolution: int = None,
         **kwargs,
     ) -> BaseModel:
         """
@@ -32,6 +30,6 @@ class ModelFactory:
         elif model_type == "hpsv2":
             return HPSv2Model(model_path)
         elif model_type == "sd":
-            return StableDiffusionModel(model_path, offload_to_cpu, resolution, **kwargs)
+            return StableDiffusionModel(model_path, **kwargs)
         else:
             raise ValueError("Unsupported model type. Use 'sd' for stable diffusion models or 'hps' for HPS models.")
