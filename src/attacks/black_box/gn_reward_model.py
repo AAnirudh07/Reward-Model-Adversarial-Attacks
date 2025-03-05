@@ -6,7 +6,7 @@ class GNRewardModel(BaseAttack):
     Gaussian Noise attack for reward models.
 
     Arguments:
-        model (nn.Module): reward model to attack.
+        model (BaseModel): reward model to attack.
         std (float): standard deviation of the Gaussian noise (Default: 0.1).
     """
 
