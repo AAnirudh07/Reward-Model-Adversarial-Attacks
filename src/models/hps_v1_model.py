@@ -23,6 +23,7 @@ class HPSv1Model(BaseModel):
                 raise ModelLoadingError("Checkpoint does not contain 'state_dict'.")
             
             self.model.load_state_dict(checkpoint["state_dict"])
+            self.model.eval()
 
         except FileNotFoundError as e:
             raise ModelLoadingError(f"Model checkpoint not found at '{self.model_path}'.") from e
@@ -51,8 +52,26 @@ class HPSv1Model(BaseModel):
                 text_features = text_features / text_features.norm(dim=-1, keepdim=True)
 
                 # Convert cosine similarity scores to percentages as in the original paper
-                similarity_scores = (image_features @ text_features.T).diag() * 100
-                
+                similarity_scores = (image_features @ text_features.T).diag() * 100    
             return similarity_scores.tolist()
+        except Exception as e:
+            raise InferenceError(f"Inference failed: {e}") from e   
+        
+    def inference_with_grad(self, inputs: torch.Tensor, captions: List[str]) -> List[float]:
+        """
+        Runs inference on a batch of images and corresponding captions.
+        Returns a batch of reward scores.
+        """
+        if not isinstance(inputs, torch.Tensor):
+            raise TypeError("Expected 'inputs' to be of type torch.Tensor (i.e. images).")
+        if not isinstance(captions, list) or not all(isinstance(c, str) for c in captions):
+            raise TypeError("Expected 'captions' to be a list of strings.")
+        if inputs.shape[0] != len(captions):
+            raise ValueError("Number of 'inputs' and 'captions' must match.")
+        
+        try:
+            text_tokens = clip.tokenize(captions).to(self.device)
+            image_features, text_features = self.model(inputs, text_tokens)
+            return (image_features @ text_features.T).diag() * 100
         except Exception as e:
             raise InferenceError(f"Inference failed: {e}") from e
