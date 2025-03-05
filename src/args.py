@@ -12,7 +12,7 @@ def check_reward_model(value):
     valid_versions = ["v1.0", "v2.0", "v2.1"]
     if value not in valid_versions:
         raise argparse.ArgumentTypeError(
-            "reward_model_name must be one of: 'v1.0', 'v2.0', 'v2.1'.")
+            "reward_model_name must be one of: 'v1.0', 'v2.0'.")
     return value
 
 def check_dataset_name(value):
@@ -37,7 +37,7 @@ def parse_args():
     models.add_argument("--target_model_name", type=check_target_model, required=True,
                         help="HuggingFace model ID in format <repo-owner>/stable-diffusion-[1|2|3]")
     models.add_argument("--reward_model_name", type=check_reward_model, required=True,
-                        help="HPS reward model version: v1.0, v2.0, or v2.1")
+                        help="HPS reward model version: v1.0, v2.0")
     models.add_argument("--reward_threshold", type=float, default=70.0,
                         help="Minimum reward score for attack (default: 70.0)")
 
