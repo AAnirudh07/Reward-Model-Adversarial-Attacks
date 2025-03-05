@@ -1,9 +1,7 @@
 import torch
-import torch.nn as nn
+from attacks.base_attack import BaseAttack
 
-from torchattacks.attack import Attack
-
-class FGSMRewardModel(Attack):
+class FGSMRewardModel(BaseAttack):
     """
     FGSM for reward models.
     
