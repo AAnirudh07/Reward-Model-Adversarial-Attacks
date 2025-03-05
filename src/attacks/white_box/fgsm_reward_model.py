@@ -19,7 +19,7 @@ class FGSMRewardModel(BaseAttack):
         self.eps = eps
         self.supported_mode = ["default"]
 
-    def forward(self, images):
+    def forward(self, images, labels=None):
         """
         Overridden forward method for attacking a reward model.
         """
