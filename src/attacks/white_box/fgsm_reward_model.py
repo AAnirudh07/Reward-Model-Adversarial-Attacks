@@ -30,8 +30,6 @@ class FGSMRewardModel(Attack):
         images.requires_grad = True
 
         reward = self.model.inference(images)
-
-        # Define loss as negative reward, so minimizing loss reduces the reward.
         cost = -reward
 
         grad = torch.autograd.grad(
