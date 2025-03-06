@@ -36,7 +36,6 @@ class PGDRewardModel(BaseAttack):
         """
         Overridden forward method for attacking a reward model.
         """
-        # Create a dataset from images and labels.
         dataset = ImagePromptDataset(images, labels)
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False)
         images_list = []
