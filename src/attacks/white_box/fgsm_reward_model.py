@@ -1,69 +1,46 @@
 import torch
+from torch.utils.data import DataLoader
 from attacks.base_attack import BaseAttack
+from datasets.image_prompt_dataset import ImagePromptDataset
 
 class FGSMRewardModel(BaseAttack):
     """
     FGSM for reward models.
-    
+
     Instead of using cross-entropy, this attack uses a custom loss:
     Loss = -reward, so that the adversary minimizes the reward score.
-    
+
     Distance Measure: Linf
-    
+
     Arguments:
         model (BaseModel): reward model to attack.
         eps (float): maximum perturbation. (Default: 8/255)
-        batch_size (int): batch size for running model.inference in global mode. (Default: 8)
-        average_over_dataset (bool): 
-            If True, computes a single global loss (and gradient) by averaging the loss over all samples across batches.
-            If False, processes one image at a time.
+        batch_size (int): batch size for processing images via DataLoader.
     """
-    def __init__(self, model, eps=8/255, batch_size=8, average_over_dataset=False):
+    def __init__(self, model, eps=8/255, batch_size=1):
         super().__init__("FGSMRewardModel", model)
         self.eps = eps
         self.batch_size = batch_size
-        self.average_over_dataset = average_over_dataset
         self.supported_mode = ["default"]
 
     def forward(self, images, labels):
         """
-        Overridden forward method for attacking a reward model.
+        Overridden forward method for attacking a reward model using a DataLoader.
         """
-        images = images.clone().detach().to(self.device)
-        images.requires_grad = True
-        num_images = images.shape[0]
-        
-        if self.average_over_dataset:
-            total_loss = 0.0
-            total_samples = 0
+        dataset = ImagePromptDataset(images, labels)
+        loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False)
+        adv_images_list = []
 
-            for i in range(0, num_images, self.batch_size):
-                batch_images = images[i: i + self.batch_size]
-                batch_labels = labels[i: i + self.batch_size]
+        for images, labels in loader:
+            images = images.clone().detach().to(self.device)
+            images.requires_grad = True
 
-                total_loss += -sum(self.model.inference(batch_images, batch_labels))
-                total_samples += batch_images.shape[0]
+            reward = self.model.inference_with_grad(images, labels)
+            loss = -reward.mean()
+            grad = torch.autograd.grad(loss, images, retain_graph=False, create_graph=False)[0]
+            adv_batch = images + self.eps * grad.sign()
+            adv_batch = torch.clamp(adv_batch, 0, 1).detach()
+            adv_images_list.append(adv_batch)
 
-            global_loss = total_loss / total_samples
-            grad = torch.autograd.grad(global_loss, images, retain_graph=False, create_graph=False)[0]
-            adv_images = images + self.eps * grad.sign()
-            adv_images = torch.clamp(adv_images, 0, 1).detach()
-            return adv_images
-
-        else:
-            adv_images = []
-            for i in range(num_images):
-                image = images[i:i+1]  
-                prompt = [labels[i]]   
-
-                reward = self.model.inference(image, prompt)
-
-                loss = -reward.mean()
-
-                grad = torch.autograd.grad(loss, image, retain_graph=False, create_graph=False)[0]
-                adv_image = image + self.eps * grad.sign()
-                adv_image = torch.clamp(adv_image, 0, 1).detach()
-                adv_images.append(adv_image)
-
-            adv_images = torch.cat(adv_images, dim=0)
-            return adv_images
+        adv_images = torch.cat(adv_images_list, dim=0)
+        return adv_images
