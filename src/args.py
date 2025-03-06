@@ -36,10 +36,6 @@ def parse_model_args():
     models = parser.add_argument_group("models")
     models.add_argument("--target_model_name", type=check_target_model, required=True,
                         help="HuggingFace model ID in format <repo-owner>/stable-diffusion-[1|2|3]")
-    models.add_argument("--reward_model_name", type=check_reward_model, required=True,
-                        help="HPS reward model version: v1.0, v2.0")
-    models.add_argument("--reward_threshold", type=float, default=70.0,
-                        help="Minimum reward score for attack (default: 70.0)")
 
     # Datasets group
     datasets = parser.add_argument_group("datasets")
@@ -75,6 +71,8 @@ def parse_attack_args():
     models = parser.add_argument_group("models")
     models.add_argument("--reward_model_name", type=check_reward_model, required=True,
                         help="HPS reward model version: v1.0, v2.0")
+    models.add_argument("--reward_threshold", type=float, default=70.0,
+                        help="Minimum reward score for attack (default: 70.0)")
 
     # Attack group
     attack = parser.add_argument_group("attack")
@@ -92,7 +90,7 @@ def parse_attack_args():
     return args
 
 
-def parse_transfer_attack_args():
+def parse_transfer_test_args():
     parser = argparse.ArgumentParser(
         description="Argument partser for attack process."
     )
