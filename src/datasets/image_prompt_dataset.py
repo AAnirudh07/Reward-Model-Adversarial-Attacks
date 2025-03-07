@@ -5,12 +5,16 @@ from torch.utils.data import Dataset
 
 from datasets.error import DatasetFormatError
 class ImagePromptDataset(Dataset):
-    def __init__(self, image_list: List[PIL.Image], prompt_list: List[Tuple[str, str]], transforms: callable):
+    def __init__(
+            self, 
+            image_list: List[PIL.Image], prompt_list: List[Tuple[str, str]], 
+            image_transform_function: callable, text_tokenizer_function: callable):
         """
         Args:
             image_list (List[PIL.Image]): List of PIL images.
             prompt_list (List[Tuple[str, str]]): List of (category, prompt) tuples.
-            transforms (callable): CLIP preprocessing functions.
+            image_transform_function (callable): Function to transform PIL images.
+            text_tokenizer_function (callable): Function to tokenize text prompts.
         """
         if len(image_list) == 0 or len(prompt_list) == 0:
             raise DatasetFormatError("Both image_list and prompt_list must be non-empty.")
@@ -19,13 +23,15 @@ class ImagePromptDataset(Dataset):
 
         self.images = image_list
         self.prompts = prompt_list  # List of (category, prompt)
-        self.transforms = transforms
+        self.image_transform_function = image_transform_function
+        self.text_tokenizer_function = text_tokenizer_function
 
     def __len__(self):
         return len(self.images)
 
     def __getitem__(self, idx):
-        image = self.transforms(self.images[idx])
+        image = self.image_transform_function(self.images[idx])
         _, prompt = self.prompts[idx]
+        tokens = self.text_tokenizer_function(prompt)
 
-        return image, prompt
+        return image, tokens
