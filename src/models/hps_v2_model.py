@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 
 import torch
 import PIL
@@ -52,7 +52,7 @@ class HPSv2Model(BaseModel):
         except Exception as e:
             raise ModelLoadingError(f"Error loading model: {e}") from e
 
-    def inference(self, inputs: torch.Tensor, captions: List[str]) -> List[float]:
+    def inference(self, inputs: torch.Tensor, captions: Union[List[str], torch.Tensor]) -> List[float]:
         """
         Runs inference on a batch of images and corresponding captions.
         Returns a batch of reward scores.
@@ -66,8 +66,11 @@ class HPSv2Model(BaseModel):
         
         try:
             with torch.no_grad():
-                text_tokens = self.tokenizer(captions).to(self.device)
-
+                if not isinstance(captions, torch.Tensor):
+                    text_tokens = self.tokenizer(captions).to(self.device)
+                else:
+                    text_tokens = captions.to(self.device)
+                    
                 with torch.cuda.amp.autocast():
                     outputs = self.model(inputs, text_tokens)
                     image_features, text_features = outputs["image_features"], outputs["text_features"]

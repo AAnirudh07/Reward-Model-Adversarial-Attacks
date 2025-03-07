@@ -1,6 +1,6 @@
 import clip
 import torch
-from typing import List
+from typing import List, Union
 from models.base_model import BaseModel
 from models.error import ModelLoadingError, InferenceError
 
@@ -31,7 +31,7 @@ class HPSv1Model(BaseModel):
         except Exception as e:
             raise ModelLoadingError(f"Error loading model: {e}") from e
 
-    def inference(self, inputs: torch.Tensor, captions: List[str]) -> List[float]:
+    def inference(self, inputs: torch.Tensor, captions: Union[List[str], torch.Tensor]) -> List[float]:
         """
         Runs inference on a batch of images and corresponding captions.
         Returns a batch of reward scores.
@@ -46,7 +46,11 @@ class HPSv1Model(BaseModel):
         try:
             with torch.no_grad():
                 image_features = self.model.encode_image(inputs.to(self.device))
-                text_tokens = clip.tokenize(captions).to(self.device)
+
+                if not isinstance(captions, torch.Tensor):
+                    text_tokens = self.tokenizer(captions).to(self.device)
+                else:
+                    text_tokens = captions.to(self.device)
                 text_features = self.model.encode_text(text_tokens)
 
                 image_features = image_features / image_features.norm(dim=-1, keepdim=True)
