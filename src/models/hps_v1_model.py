@@ -16,13 +16,14 @@ class HPSv1Model(BaseModel):
 
     def load_model(self):
         try:
-            self.model, self.preprocess = clip.load("ViT-L/14", device=self.device)
+            self.model, self.preprocess_function = clip.load("ViT-L/14", device=self.device)
             checkpoint = torch.load(self.model_path)
 
             if "state_dict" not in checkpoint:
                 raise ModelLoadingError("Checkpoint does not contain 'state_dict'.")
             
             self.model.load_state_dict(checkpoint["state_dict"])
+            self.tokenizer = clip.tokenize
             self.model.eval()
 
         except FileNotFoundError as e:
