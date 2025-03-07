@@ -27,7 +27,11 @@ class FGSMRewardModel(BaseAttack):
         """
         Overridden forward method for attacking a reward model using a DataLoader.
         """
-        dataset = ImagePromptDataset(images, labels)
+        dataset = ImagePromptDataset(
+            image_list=images, prompt_list=labels,
+            image_transform_function=self.model.preprocess_function,
+            text_tokenizer_function=None
+        )
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=False)
         adv_images_list = []
 
