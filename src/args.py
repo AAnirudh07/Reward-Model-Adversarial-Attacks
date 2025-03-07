@@ -71,8 +71,8 @@ def parse_attack_args():
     models = parser.add_argument_group("models")
     models.add_argument("--reward_model_name", type=check_reward_model, required=True,
                         help="HPS reward model version: v1.0, v2.0")
-    models.add_argument("--reward_threshold", type=float, default=70.0,
-                        help="Minimum reward score for attack (default: 70.0)")
+    models.add_argument("--reward_threshold", type=float, default=15.0,
+                        help="Minimum reward score for attack (default: 15.0)")
 
     # Attack group
     attack = parser.add_argument_group("attack")
