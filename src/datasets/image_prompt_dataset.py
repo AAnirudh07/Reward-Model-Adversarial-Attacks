@@ -8,7 +8,8 @@ class ImagePromptDataset(Dataset):
     def __init__(
             self, 
             image_list: List[PIL.Image], prompt_list: List[Tuple[str, str]], 
-            image_transform_function: callable, text_tokenizer_function: callable):
+            image_transform_function: callable, text_tokenizer_function: callable = None
+        ):
         """
         Args:
             image_list (List[PIL.Image]): List of PIL images.
@@ -32,6 +33,9 @@ class ImagePromptDataset(Dataset):
     def __getitem__(self, idx):
         image = self.image_transform_function(self.images[idx])
         _, prompt = self.prompts[idx]
-        tokens = self.text_tokenizer_function(prompt)
+        if self.text_tokenizer_function is None:
+            tokens = prompt
+        else:
+            tokens = self.text_tokenizer_function(prompt)
 
         return image, tokens
