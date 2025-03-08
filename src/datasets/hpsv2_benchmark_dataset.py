@@ -6,4 +6,4 @@ from datasets.base_prompt_dataset import BasePromptDataset
 class HPSV2PromptDataset(BasePromptDataset):
     def load_dataset(self) -> Dict[str, List[str]]:
         all_prompts = hpsv2.benchmark_prompts("all")
-        return all_prompts.items()
+        return dict(all_prompts.items())
