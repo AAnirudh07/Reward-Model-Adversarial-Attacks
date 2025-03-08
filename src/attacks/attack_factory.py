@@ -7,7 +7,7 @@ from attacks.black_box.spsa_reward_model import SPSARewardModel
 
 class AttackFactory:
     @staticmethod
-    def create_dataset(
+    def create_attack(
         attack_type: str,
         model: BaseModel,
         **kwargs,
