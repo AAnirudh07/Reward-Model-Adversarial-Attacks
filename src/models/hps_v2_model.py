@@ -57,7 +57,7 @@ class HPSv2Model(BaseModel):
         Runs inference on a batch of images and corresponding captions.
         Returns a batch of reward scores.
         """
-        if not isinstance(inputs, list) or not all(isinstance(i, PIL.Image.Image) for i in inputs):
+        if not isinstance(inputs, torch.Tensor):
             raise TypeError("Expected 'inputs' to be a list of PIL.Image objects.")
         if not isinstance(captions, list) or not all(isinstance(c, str) for c in captions):
             raise TypeError("Expected 'captions' to be a list of strings.")
@@ -70,6 +70,7 @@ class HPSv2Model(BaseModel):
                     text_tokens = self.tokenizer(captions).to(self.device)
                 else:
                     text_tokens = captions.to(self.device)
+                inputs = inputs.to(self.device)
                     
                 with torch.cuda.amp.autocast():
                     outputs = self.model(inputs, text_tokens)
@@ -86,7 +87,7 @@ class HPSv2Model(BaseModel):
         Runs inference on a batch of images and corresponding captions.
         Returns a batch of reward scores.
         """
-        if not isinstance(inputs, list) or not all(isinstance(i, PIL.Image.Image) for i in inputs):
+        if not isinstance(inputs, torch.Tensor):
             raise TypeError("Expected 'inputs' to be a list of PIL.Image objects.")
         if not isinstance(captions, list) or not all(isinstance(c, str) for c in captions):
             raise TypeError("Expected 'captions' to be a list of strings.")
@@ -95,6 +96,7 @@ class HPSv2Model(BaseModel):
         
         try:
             text_tokens = self.tokenizer(captions).to(self.device)
+            inputs = inputs.to(self.device)
 
             with torch.cuda.amp.autocast():
                 outputs = self.model(inputs, text_tokens)
