@@ -1,5 +1,6 @@
 import gc
 import torch
+from torch.utils.data import Dataset
 
 def clear_cuda_memory_and_force_gc(force: bool = False):
     """
@@ -18,3 +19,13 @@ def clear_cuda_memory_and_force_gc(force: bool = False):
     if memory_allocated > memory_threshold or force:
         torch.cuda.empty_cache()
         gc.collect()
+
+class SampledDataset(Dataset):
+    def __init__(self, prompts):
+        self.prompts = prompts
+
+    def __len__(self):
+        return len(self.prompts)
+
+    def __getitem__(self, idx):
+        return self.prompts[idx]
