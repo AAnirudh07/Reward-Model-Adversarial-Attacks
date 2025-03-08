@@ -24,11 +24,11 @@ class StableDiffusionModel(BaseDiffusionModel):
     def _get_diffusion_pipeline(self):
         version_tag = self.model_path.split("/")[-1].lower()
 
-        if re.search(r'(stable-diffusion-?(v-?|v)?1(?:-\d+)?)$', version_tag):
+        if re.search(r'(stable-diffusion-?(v-?|v)?1(?:-\d+)?)(.*)?$', version_tag):
             return StableDiffusionPipeline
-        elif re.search(r'(stable-diffusion-?(v-?|v)?2(?:-\d+)?)$', version_tag):
+        elif re.search(r'(stable-diffusion-?(v-?|v)?2(?:-\d+)?)(.*)?$', version_tag):
             return DiffusionPipeline
-        elif re.search(r'(stable-diffusion-?(v-?|v)?3(?:-\d+)?)$', version_tag):
+        elif re.search(r'(stable-diffusion-?(v-?|v)?3(?:-\d+)?)(.*)?$', version_tag):
             return StableDiffusion3Pipeline
         else:
             raise ValueError(

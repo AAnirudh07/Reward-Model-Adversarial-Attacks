@@ -2,7 +2,7 @@ import argparse
 import re
 
 def check_target_model(value):
-    pattern = r'^[^/]+/(stable-diffusion-?(v-?|v)?[123](?:-\d+)?)$'
+    pattern = r'^[^/]+/(stable-diffusion-?(v-?|v)?[123](?:-\d+)?)(.*)?$'
     
     if not re.match(pattern, value):
         raise argparse.ArgumentTypeError(
