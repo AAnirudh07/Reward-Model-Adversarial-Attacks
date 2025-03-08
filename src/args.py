@@ -2,10 +2,13 @@ import argparse
 import re
 
 def check_target_model(value):
-    pattern = r'^[^/]+/stable-diffusion-[123]$'
+    pattern = r'^[^/]+/(stable-diffusion-?(v-?|v)?[123](?:-\d+)?)$'
+    
     if not re.match(pattern, value):
         raise argparse.ArgumentTypeError(
-            "target_model_name must be in the format '<repo-owner>/stable-diffusion-[1|2|3]'.")
+            "target_model_name must be in the format '<repo-owner>/stable-diffusion-[1|2|3]', "
+            "'<repo-owner>/stable-diffusion-v[1|2|3]', or '<repo-owner>/stable-diffusion-v-[1|2|3]'."
+        )
     return value
 
 def check_reward_model(value):
