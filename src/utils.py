@@ -22,10 +22,10 @@ def clear_cuda_memory_and_force_gc(force: bool = False):
 
 class SampledDataset(Dataset):
     def __init__(self, prompts):
-        self.prompts = prompts
+        self.data = [{"category": c, "prompt": p} for c, p in zip(prompts["category"], prompts["prompt"])]
 
     def __len__(self):
-        return len(self.prompts)
+        return len(self.data)
 
     def __getitem__(self, idx):
-        return self.prompts[idx]
+        return self.data[idx]
