@@ -54,7 +54,7 @@ def parse_model_args():
     misc.add_argument("--inference_batch_size", type=int, default=4,
                         help="Batch size for target model inference (default: 4)")
     misc.add_argument("--no_save_image_results", dest="save_image_results", action="store_false",
-                        help="Do not store images, prompts, and reward scores that pass threshold")
+                        help="Do not store images and prompts")
     misc.set_defaults(save_image_results=True)
 
     args = parser.parse_args()
@@ -79,6 +79,8 @@ def parse_attack_args():
 
     # Datasets group
     datasets = parser.add_argument_group("datasets")
+    datasets.add_argument("--dataset_name", type=check_dataset_name, required=True,
+                        help="Dataset for generating preliminary images: 'hps' or 'drawbench'")
     datasets.add_argument("--num_samples_per_category", type=int, default=None,
                         help="Number of text prompts per category (default: 5 for hps, 2 for drawbench)")
 
@@ -93,7 +95,8 @@ def parse_attack_args():
                         help="Path where base images and prompts are stored")
     misc.add_argument("--attack_batch_size", type=int, default=8,
                         help="Batch size for PGD & FGSM attack (default: 8)")
-
+    misc.add_argument("--no_save_image_results", dest="save_image_results", action="store_false",
+                        help="Do not store adversarial images, prompts, and reward scores")
 
     args = parser.parse_args()
     if args.num_samples_per_category is None:
@@ -102,7 +105,6 @@ def parse_attack_args():
         else:  # drawbench
             args.num_samples_per_category = 2
     return args
-
 
 def parse_transfer_test_args():
     parser = argparse.ArgumentParser(
