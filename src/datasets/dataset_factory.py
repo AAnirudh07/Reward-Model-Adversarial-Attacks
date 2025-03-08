@@ -14,7 +14,7 @@ class DatasetFactory:
         
         if dataset_type == "drawbench":
             return DrawBenchPromptDataset()
-        elif dataset_type == "hpsv2":
+        elif dataset_type == "hps":
             return HPSV2PromptDataset()
         elif dataset_type == "imageandprompt":
             return ImagePromptDataset(**kwargs)
