@@ -77,6 +77,11 @@ def parse_attack_args():
     models.add_argument("--reward_threshold", type=float, default=15.0,
                         help="Minimum reward score for attack (default: 15.0)")
 
+    # Datasets group
+    datasets = parser.add_argument_group("datasets")
+    datasets.add_argument("--num_samples_per_category", type=int, default=None,
+                        help="Number of text prompts per category (default: 5 for hps, 2 for drawbench)")
+
     # Attack group
     attack = parser.add_argument_group("attack")
     attack.add_argument("--attack_name", type=check_attack_name, required=True,
@@ -89,7 +94,13 @@ def parse_attack_args():
     misc.add_argument("--attack_batch_size", type=int, default=8,
                         help="Batch size for PGD & FGSM attack (default: 8)")
 
+
     args = parser.parse_args()
+    if args.num_samples_per_category is None:
+        if args.dataset_name == "hps":
+            args.num_samples_per_category = 5
+        else:  # drawbench
+            args.num_samples_per_category = 2
     return args
 
 
