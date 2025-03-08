@@ -81,3 +81,24 @@ class BaseAttack(Attack):
         if given_training:
             pass
             # self.model.train()
+
+    def __call__(self, inputs, labels=None, *args, **kwargs):
+      # given_training = self.model.training
+      # self._change_model_mode(given_training)
+
+      if self._normalization_applied is True:
+          inputs = self.inverse_normalize(inputs)
+          self._set_normalization_applied(False)
+
+          adv_inputs = self.forward(inputs, labels, *args, **kwargs)
+          # adv_inputs = self.to_type(adv_inputs, self.return_type)
+
+          adv_inputs = self.normalize(adv_inputs)
+          self._set_normalization_applied(True)
+      else:
+          adv_inputs = self.forward(inputs, labels, *args, **kwargs)
+          # adv_inputs = self.to_type(adv_inputs, self.return_type)
+
+      # self._recover_model_mode(given_training)
+
+      return adv_inputs
