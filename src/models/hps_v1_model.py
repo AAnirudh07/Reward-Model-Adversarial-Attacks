@@ -38,8 +38,8 @@ class HPSv1Model(BaseModel):
         """
         if not isinstance(inputs, torch.Tensor):
             raise TypeError("Expected 'inputs' to be of type torch.Tensor (i.e. images).")
-        if not isinstance(captions, list) or not all(isinstance(c, str) for c in captions):
-            raise TypeError("Expected 'captions' to be a list of strings.")
+        if not (isinstance(captions, torch.Tensor) or (isinstance(captions, list) and all(isinstance(c, str) for c in captions))):
+            raise TypeError("Expected 'captions' to be either a torch.Tensor or a list of strings.")
         if inputs.shape[0] != len(captions):
             raise ValueError("Number of 'inputs' and 'captions' must match.")
         
