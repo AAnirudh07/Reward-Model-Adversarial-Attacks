@@ -2,6 +2,7 @@ import torch
 from torch.utils.data import DataLoader
 from attacks.base_attack import BaseAttack
 from datasets.image_prompt_dataset import ImagePromptDataset
+from utils import clear_cuda_memory_and_force_gc
 
 class PGDRewardModel(BaseAttack):
     """
@@ -37,7 +38,7 @@ class PGDRewardModel(BaseAttack):
         Overridden forward method for attacking a reward model.
         """
         dataset = ImagePromptDataset(
-            image_list=images, prompt_list=labels, 
+            image_list=images, prompt_list=labels,
             image_transform_function=self.model.preprocess_function,
             text_tokenizer_function=None
         )
@@ -57,24 +58,27 @@ class PGDRewardModel(BaseAttack):
             adv_images = adv_images + torch.empty_like(adv_images).uniform_(-self.eps, self.eps)
             adv_images = torch.clamp(adv_images, 0, 1).detach()
 
-        # PGD steps: process the global adversarial images in mini-batches using slicing.
         for _ in range(self.steps):
-            total_loss = torch.tensor(0.0, device=self.device)
+            global_grad = torch.zeros_like(adv_images)
             total_samples = 0
 
             for i in range(0, num_images, self.batch_size):
                 batch_images = adv_images[i: i + self.batch_size]
                 batch_prompts = prompts_list[i: i + self.batch_size]
-                batch_images.requires_grad_() 
+
+                batch_images.requires_grad_()
 
                 reward = self.model.inference_with_grad(batch_images, batch_prompts)
-                total_loss += -reward.sum() 
+                loss = -reward.sum() / num_images
+
+                grad = torch.autograd.grad(loss, batch_images)[0]
+                global_grad[i: i + self.batch_size] = grad
+
                 total_samples += batch_images.shape[0]
 
-            global_loss = total_loss / total_samples
-            grad = torch.autograd.grad(global_loss, adv_images, retain_graph=False, create_graph=False)[0]
-            adv_images = adv_images.detach() + self.alpha * grad.sign()
+                clear_cuda_memory_and_force_gc(force=True)
+
+            adv_images = adv_images.detach() + self.alpha * global_grad.sign()
             delta = torch.clamp(adv_images - all_images, min=-self.eps, max=self.eps)
             adv_images = torch.clamp(all_images + delta, 0, 1).detach()
-
         return adv_images
