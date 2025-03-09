@@ -8,7 +8,7 @@ import torchvision.transforms as T
 
 from models.model_factory import ModelFactory
 from attacks.attack_factory import AttackFactory
-from utils import SampledDataset, clear_cuda_memory_and_force_gc, compute_reward_statistics
+from utils import SampledDataset, clear_cuda_memory_and_force_gc, compute_reward_statistics, numerical_key
 
 reward_model = ModelFactory.create_model(
     model_type="hpsv2",   
@@ -31,7 +31,7 @@ def run_attack_rank_model(run_attack_args):
                 prompts["category"].append(category)
                 prompts["prompt"].append(prompt)
 
-    image_files = sorted([f for f in os.listdir(image_directory) if f.endswith(".png")]) 
+    image_files = sorted([f for f in os.listdir(image_directory) if f.endswith(".png")], key=numerical_key) 
     original_images = [Image.open(os.path.join(image_directory, img_file)) for img_file in image_files]
 
     dataset = SampledDataset(
@@ -95,7 +95,7 @@ def run_attack_reward_model(run_attack_args, top_k_prompts, reward_model):
                 image_filename = os.path.join(output_dir, f"image_{idx}.png")
                 pil_img = to_pil(adv_img.cpu())
                 pil_img.save(image_filename)
-                pf.write(f"Image {idx}: ({pr[0]}, {pr[1]}, {orig_r}, {adv_r})\n")
+                pf.write(f"Image {idx}: ({repr(pr[0])}, {repr(pr[1])}, {orig_r}, {adv_r})\n")
 
     stats = compute_reward_statistics(top_k_prompts, adv_rewards)
     print("\n" + "=" * 40)
