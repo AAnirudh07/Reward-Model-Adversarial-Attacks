@@ -1,4 +1,5 @@
 import gc
+import re
 import torch
 from torch.utils.data import Dataset
 
@@ -70,3 +71,8 @@ def compute_reward_statistics(top_k_prompts, adv_rewards):
         "per_category_original": per_category_orig_avg,
         "per_category_adversarial": per_category_adv_avg
     }
+
+def numerical_key(filename):
+    # Extract the number from filename like "image_1.png"
+    match = re.search(r'\d+', filename)
+    return int(match.group()) if match else -1
