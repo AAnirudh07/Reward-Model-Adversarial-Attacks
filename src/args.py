@@ -118,7 +118,9 @@ def parse_transfer_test_args():
 
     # Misc group
     misc = parser.add_argument_group("misc")
-    misc.add_argument("--saved_images_path", type=str, required=True,
+    misc.add_argument("--original_images_path", type=str, required=True,
+                        help="Path where original images are stored")
+    misc.add_argument("--adversarial_images_path", type=str, required=True,
                         help="Path where adversarial images are stored")
 
     args = parser.parse_args()
