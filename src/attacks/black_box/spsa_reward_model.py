@@ -12,22 +12,19 @@ class SPSARewardModel(BaseAttack):
     """
     SPSA attack for reward models.
 
-    This attack approximates the gradient of the reward output with respect to the input
-    image using SPSA (Simultaneous Perturbation Stochastic Approximation) and updates the input
-    to reduce the reward score.
-
-    Distance Measure : L_infinity
+    Distance Measure : L_inf
 
     Arguments:
         model (nn.Module): Reward model to attack. It should take an image tensor and output a scalar reward.
-        eps (float): maximum perturbation. (Default: 8/255)
+        eps (float): maximum perturbation. (Default: 0.3)
         delta (float): smoothing parameter for gradient approximation. (Default: 0.01)
         lr (float): learning rate for the optimizer. (Default: 0.01)
         nb_iter (int): number of attack iterations. (Default: 1)
         nb_sample (int): number of samples for SPSA gradient approximation. (Default: 128)
         max_batch_size (int): maximum batch size for gradient estimation. (Default: 64)
+        batch_size (int): mini-batch size for processing inputs from the dataset. (Default: 8)
     """
-    def __init__(self, model, eps=8/255, delta=0.01, lr=0.01, nb_iter=1, nb_sample=128, max_batch_size=64, dataset_batch_size=8):
+    def __init__(self, model, eps=0.3, delta=0.01, lr=0.01, nb_iter=1, nb_sample=128, max_batch_size=64, batch_size=8):
         super().__init__("SPSARewardModel", model)
         self.eps = eps
         self.delta = delta
@@ -35,7 +32,7 @@ class SPSARewardModel(BaseAttack):
         self.nb_iter = nb_iter
         self.nb_sample = nb_sample
         self.max_batch_size = max_batch_size
-        self.dataset_batch_size = dataset_batch_size
+        self.dataset_batch_size = batch_size
         self.supported_mode = ["default"]
 
     def forward(self, images, labels):
@@ -56,6 +53,7 @@ class SPSARewardModel(BaseAttack):
 
     def loss(self, images, labels):
         reward = self.model.inference(images, labels)
+        reward = torch.tensor(reward, device=images.device)
         return -reward.mean()
 
     def linf_clamp_(self, dx, x, eps):
@@ -73,30 +71,35 @@ class SPSARewardModel(BaseAttack):
 
     @torch.no_grad()
     def spsa_grad(self, images, labels, delta, nb_sample, max_batch_size):
+        # images shape: (B, C, H, W)
         grad = torch.zeros_like(images)
-        images = torch.unsqueeze(images, 0)
-        labels = torch.unsqueeze(labels, 0)
+        B = images.shape[0]
 
-        images = images.expand(max_batch_size, *images.shape[1:]).contiguous()
-        labels = labels.expand(max_batch_size, *labels.shape[1:]).contiguous()
+        images = images.unsqueeze(1)   # (B, 1, C, H, W)
+        labels = labels.unsqueeze(1)   # (B, 1, P)
 
-        v = torch.empty_like(images[:, :1, ...])
-        for batch_size in self._get_batch_sizes(nb_sample, max_batch_size):
-            x_ = images[:batch_size]
-            y_ = labels[:batch_size]
-            vb = v[:batch_size]
-            vb = vb.bernoulli_().mul_(2.0).sub_(1.0)
-            v_ = vb.expand_as(x_).contiguous()
-            x_shape = x_.shape
-            x_ = x_.view(-1, *images.shape[2:])
-            y_ = y_.view(-1, *labels.shape[2:])
-            v_ = v_.view(-1, *v.shape[2:])
-            df = self.loss(x_ + delta * v_, y_) - self.loss(x_ - delta * v_, y_)
-            df = df.view(-1, *[1 for _ in v_.shape[1:]])
-            grad_ = df / (2.0 * delta * v_)
-            grad_ = grad_.view(x_shape)
-            grad_ = grad_.sum(dim=0, keepdim=False)
-            grad += grad_
+        images = images.expand(B, max_batch_size, *images.shape[2:]).contiguous()  # (B, max_batch_size, C, H, W)
+        labels = labels.expand(B, max_batch_size, *labels.shape[2:]).contiguous()
+
+        v = torch.empty_like(images[:, :, :1, ...])  # (B, max_batch_size, 1, H, W)
+        for current_batch in self._get_batch_sizes(nb_sample, max_batch_size):
+            x_batch = images[:, :current_batch].contiguous()  # (B, current_batch, C, H, W)
+            y_batch = labels[:, :current_batch].contiguous()    # (B, current_batch, P)
+            v_batch = v[:, :current_batch]
+            v_batch.bernoulli_().mul_(2.0).sub_(1.0)
+            v_batch_exp = v_batch.expand_as(x_batch).contiguous()  # (B, current_batch, C, H, W)
+
+            B_curr, bs, C, H, W = x_batch.shape
+            x_batch_reshaped = x_batch.view(B_curr * bs, C, H, W)
+            y_batch_reshaped = y_batch.view(B_curr * bs, -1)
+            v_batch_reshaped = v_batch_exp.view(B_curr * bs, C, H, W)
+
+            df = self.loss(x_batch_reshaped + delta * v_batch_reshaped, y_batch_reshaped) \
+                 - self.loss(x_batch_reshaped - delta * v_batch_reshaped, y_batch_reshaped)
+            df = df.view(-1, *([1] * (v_batch_reshaped.dim()-1)))
+            grad_batch = (df / (2.0 * delta)) * v_batch_reshaped # equivalent to original code as each element of v_batch_reshaped is +-1
+            grad_batch = grad_batch.view(B_curr, bs, C, H, W)
+            grad += grad_batch.sum(dim=1)
 
         grad /= nb_sample
         return grad
