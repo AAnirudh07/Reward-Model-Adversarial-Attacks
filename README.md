@@ -34,14 +34,17 @@ The Gaussian Noise, Fast Gradient Sign Method (FGSM), Projected Gradient Descent
 
 Since the torchattacks library[6] is designed for classification tasks using losses like `CrossEntropyLoss`, adjustments were necessary for reward models that output a single continuous value from 0 to 100. The base `Attack` class was altered to support custom models classes. Although subclassing the torchattacks datasets was not strictly required, it was adopted to facilitate similar modifications for other attacks from a base implementation. (`WB` - White Box; `BB` - Black Box)
 - **Gaussian Noise (BB)**: Required no major changes as it simply adds noise to the input.
-
 - **FGSM (WB)**: This white-box attack adds perturbations in the direction of the gradient i.e. increasing loss. The loss was redefined as `–reward` so that the perturbations effectively decrease the reward. The raw reward was used directly as it provided a clear gradient signal. Additionally, the implementation was modified to support batch processing to allow averaging of reward scores across batches.
 - **PGD (WB)**: The PGD attack was adapted in a manner similar to FGSM. Moreover, to address memory constraints, the dataset was not fully loaded into memory but processed in batches instead
 - **SPSA (BB)**: The SPSA attack code was modified to support batch processing used the same reward-based modifications as FGSM and PGD. Marginal loss was removed and the raw reward was used directly. This could have led to the degradation of the attack's effectiveness, making it only as effective as FGSM.
 
 
 # 3. Analysis
-The experiment results are analyzed in the following section.
+The experiment results are analyzed in this section.
+
+- Reward Model Analysis:
+
+# 4. Discussion
 
 # Main Results
 This section presents the numerical results of the experiments. Please see the note in the 'Method > Datasets' section for more information on prompt sampling. Additionally,
@@ -277,6 +280,89 @@ _HPSv2 Reward Model_
 
 ### Transfer Tests Results
 This sub-section presents the results of the transfer test experiments. Each entry is rounded to 2 decimal places. The lowest category in each row is highlighted in bold. Since the HPS benchmark dataset yielded better results than the DrawBench dataset, its adversarial images were selected for the transfer tests.
+
+#### Stable Diffusion 1
+<details>
+<summary>HPSv1 -> HPSv2</summary>
+
+| Attack         | Anime  | Concept-art | Painting | Photo  | Overall |
+|----------------|--------|-------------|----------|--------|---------|
+| Original       | 29.08  | 25.04       | 27.73    | 27.98  | 27.66   |
+| GN             | 26.77  | **23.70**  | 24.91    | 24.53  | 25.13   |
+| FGSM (B>1)     | 26.82  | **23.74**  | 25.01    | 24.60  | 25.19   |
+| FGSM (B=1)     | 26.82  | **23.74**  | 25.01    | 24.60  | 25.19   |
+| PGD            | 26.70  | **23.60**  | 24.92    | 24.54  | 25.10   |
+| SPSA           | 26.82  | **23.75**  | 25.01    | 24.60  | 25.20   |
+</details>
+
+<details>
+<summary>HPSv2 -> HPSv1</summary>
+
+| Attack         | Anime  | Concept-art  | Painting | Photo  | Overall |
+|----------------|--------|--------------|----------|--------|---------|
+| Original       | 20.32  | 19.32   | 20.31    | 20.16  | 20.16   |
+| GN             | 19.21  | **17.57**   | 19.04    | 18.81  | 18.87   |
+| FGSM (B>1)     | 19.08  | **17.50**   | 18.95    | 18.76  | 18.78   |
+| FGSM (B=1)     | 19.07  | **17.50**   | 18.96    | 18.76  | 18.78   |
+| PGD            | 19.12  | **17.45**   | 18.93    | 18.73  | 18.78   |
+| SPSA           | 19.19  | **17.48**   | 19.00    | 18.79  | 18.84   |
+</details>
+
+#### Stable Diffusion 2
+<details>
+<summary>HPSv1 -> HPSv2</summary>
+
+| Attack         | Anime | Concept-art | Painting | Photo | Overall |
+|----------------|-------|-------------|----------|-------|---------|
+| Original       | 28.63 | 27.72  | 28.87    | 28.61 | 28.45   |
+| GN             | 25.79 | **24.13**  | 26.84    | 25.18 | 25.40   |
+| FGSM (B>1)     | 25.95 | **24.15**  | 26.85    | 25.33 | 25.49   |
+| FGSM (B=1)     | 25.95 | **24.15**  | 26.85    | 25.33 | 25.49   |
+| PGD            | 25.80 | **24.07**  | 26.76    | 25.21 | 25.38   |
+| SPSA           | 25.95 | **24.16**  | 26.83    | 25.32 | 25.49   |
+</details>
+
+<details>
+<summary>HPSv2 -> HPSv1</summary>
+
+| Attack         | Anime  | Concept-art | Painting | Photo  | Overall |
+|----------------|--------|-------------|----------|--------|---------|
+| Original       | 20.22 | 21.38      | 20.98    | 20.81  | 20.91   |
+| GN             | 19.83  | **18.45**  | 19.25    | 19.56  | 19.16   |
+| FGSM (B>1)     | 19.80  | **18.30**  | 18.95    | 18.76  | 19.06   |
+| FGSM (B=1)     | 19.78  | **18.31**  | 19.07    | 19.60  | 19.06   |
+| PGD            | 19.73  | **18.28**  | 18.99    | 19.51  | 19.01   |
+| SPSA           | 19.84  | **18.45**  | 19.16    | 19.67  | 19.16   |
+</details>
+
+#### Stable Diffusion 3
+<details>
+<summary>HPSv1 -> HPSv2</summary>
+
+| Attack         | Anime | Concept-art | Painting | Photo  | Overall |
+|----------------|-------|-------------|----------|--------|---------|
+| Original       | 28.67 | 29.36       | 28.93    | 30.48  | 29.15   |
+| GN             | 26.88 | 25.52       | 26.08    | **24.20** | 25.94   |
+| FGSM (B>1)     | 26.88 | 25.52       | 26.08    | **24.20** | 25.94   |
+| FGSM (B=1)     | 26.88 | 25.52       | 26.08    | **24.20** | 25.94   |
+| PGD            | 26.78 | 25.30       | 25.98    | **24.18** | 25.80   |
+| SPSA           | 26.87 | 25.49       | 26.10    | **24.26** | 25.93   |
+
+</details>
+
+<details>
+<summary>HPSv2 -> HPSv1</summary>
+
+| Attack         | Anime  | Concept-art | Painting | Photo  | Overall |
+|----------------|--------|-------------|----------|--------|---------|
+| Original       | 21.80  | 20.86 | 21.88    | 22.04  | 21.59   |
+| GN             | 20.27  | **19.13**  | 19.16    | 19.98  | 19.54   |
+| FGSM (B>1)     | 19.80  | **17.50**  | 19.07    | 18.76  | 19.06   |
+| FGSM (B=1)     | 19.78  | **18.31**  | 19.07    | 18.76  | 19.06   |
+| PGD            | 19.73  | **18.28**  | 18.99    | 19.51  | 19.01   |
+| SPSA           | 20.27  | 19.19      | **19.16**| 19.93  | 19.55   |
+
+</details>
 
 # Repository Details
 
