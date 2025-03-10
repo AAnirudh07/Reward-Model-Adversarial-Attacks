@@ -9,7 +9,7 @@ Two reward models were used for this task:
 - HPSv1[​1]: This fine-tuned CLIP[2] model scores images and associated text prompts on a 0–100 scale based on alignment with  human preferences.
 - HPSv2[3​]: An enhanced iteration of HPSv1, also based on a fine-tuned CLIP architecture, trained on a more diverse set of images and text prompts.
 
-Due to memory constraints on a T4 GPU in Google Colab, I used a compressed version of the HPSv2 model. This limitation might affect the model's performance slightly compared to its full-scale counterpart.
+Due to memory constraints on a T4 GPU in Google Colab, a compressed version of the HPSv2 model was used. This limitation might affect the model's performance slightly compared to its full-scale counterpart.
 
 #### Target Models
 This analysis was conducted on the Stable Diffusion family of models:
@@ -36,7 +36,7 @@ The Gaussian Noise, Fast Gradient Sign Method (FGSM), Projected Gradient Descent
 Since the torchattacks library[6] is designed for classification tasks using losses like `CrossEntropyLoss`, adjustments were necessary for reward models that output a single continuous value from 0 to 100. The base `Attack` class was altered to support custom models classes. Although subclassing the torchattacks datasets was not strictly required, it was adopted to facilitate similar modifications for other attacks from a base implementation. (`WB` - White Box; `BB` - Black Box)
 - **Gaussian Noise (BB)**: Required no major changes as it simply adds noise to the input.
 
-- **FGSM (WB)**: This white-box attack adds perturbations in the direction of the gradient i.e. increasing loss. The loss was redefined as `–reward` so that the perturbations effectively decrease the reward. The raw reward was used directly as it provided a clearer gradient signal. Additionally, the implementation was modified to support batch processing, allowing for the averaging of reward scores across batches.
+- **FGSM (WB)**: This white-box attack adds perturbations in the direction of the gradient i.e. increasing loss. The loss was redefined as `–reward` so that the perturbations effectively decrease the reward. The raw reward was used directly as it provided a clear gradient signal. Additionally, the implementation was modified to support batch processing to allow averaging of reward scores across batches.
 - **PGD (WB)**: The PGD attack was adapted in a manner similar to FGSM. Moreover, to address memory constraints, the dataset was not fully loaded into memory but processed in batches instead
 - **SPSA (BB)**: The SPSA attack code was modified to support batch processing used the same reward-based modifications as FGSM and PGD.
 
@@ -45,7 +45,8 @@ Since the torchattacks library[6] is designed for classification tasks using los
 The experiment results are analyzed in the following section.
 
 # Main Results
-This section 
+This section presents the numerical results of the experiments.
+
 
 # Repository Details
 
