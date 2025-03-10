@@ -48,6 +48,7 @@ _Reward Model Analysis_
 - The Color category in the DrawBench dataset appears to be robust to perturbations. This could mean that reward models might not be effective in capturing subtle differences.
 
 _Target Model Analysis_
+
 While all adversarial images were scored lower than their original counterpart, there were some common themes across models:
 - Stylized categories such as Concept Art, Photo, and Paintings (HPS), Gary Marcus et al. (DrawBench), were the least robust to perturbations compared to the baseline. This suggests that the Stable Diffusion models’ approach to generating stylistic images is highly nuanced, where even minor perturbations can significantly degrade quality due to mismatching styles.
 - Categories such as Counting, Conflicting (DrawBench) were more robust to perturbations. For categories like Counting, this could mean that the target model is good at generating images that align with the prompt when there are features that are difficult to perturb, such as quantities.
@@ -56,10 +57,12 @@ _Dataset Analysis_
 - In many instances in DrawBench, no samples from the Misspellings or Rare Words categories were selected. A manual analysis revealed that image quality was not always poor. This highlights that the reward model lacks robustness to slight variations in the prompt. It would be interesting to explore how text perturbations impact reward scores!
 
 _Attack Analysis_
+- White-Box attacks performed better than Black-Box attacks on average.
 - Simply adding Gaussian noise lowered the reward score demonstrating that it is not difficult to degrade the reward model's performance. However, FGSM and SPSA performed similarly to random noise, indicating that taking a single step in the gradient direction or estimating gradients does not offer any significant advantage over random perturbations.
 - The PGD attack proved to be the most effective across both models and datasets, with movement in the direction of decreasing reward consistently fooling the reward model.
 
 _Transfer Test Analysis_
+
 Adversarial images generated to fool one reward model were only partially transferable to another. While reward scores were lower, the decreases were similar across different attacks and did not show the same pronounced drop. For example, PGD produced the highest drop across models and datasets but its scores in the transfer attack were comparable to those from Gaussian noise. This suggests that the reward models simply view these perturbations as random noise.
 
 Despite this, some categorical similarities emerged; notably, the Concept Art category consistently exhibited a significant drop in score in both the target and transfer target model.
@@ -67,8 +70,15 @@ Despite this, some categorical similarities emerged; notably, the Concept Art ca
 
 # 4. Discussion
 Some areas where this preliminary analysis could be improved:
+- Choice of Reward Model: Both HPSv1 and HPSv2 are fine-tuned versions of the CLIP. The mathematical structure of cosine similarity typically produces values that don't reach exactly 0. It might be useful to explore reward models with different architectures.
+- Choice of Target Model: Only the Stable Diffusion models were used due to memory constraints. Other open-source and closed-source (e.g. DALL.E) models could be experimented with. 
+- Ranking of Images: While the dataset choices may be optimal, ranking all images in the dataset could provide a more comprehensive evaluation.
+- Choice of Attack: More complex white-box and black-box attacks could be considered.
+
 
 # 5. Main Results
+All outputs and reward scores can be accessed [here](https://drive.google.com/drive/folders/11zujYYcT-ZieOqC6F9SIWmVzlZ9t9l5i?usp=sharing).
+
 This section presents the numerical results of the experiments. Please see the note in the 'Method > Datasets' section for more information on prompt sampling. Additionally,
 - Due to ranking and choosing top samples, some categories in the DrawBench dataset may not have results.
 - As the official HPS Benchmark has average scores of ~29, a very low threshold of 15 was used. The results consider any drop in reward scores to be significant.
@@ -387,7 +397,7 @@ This sub-section presents the results of the transfer test experiments. Each ent
 </details>
 
 # 6. Repository Details
-
+All experiments were run on Google Colab. The reproducible notebooks are present in the `notebooks/` directory. The notebooks use the code present in the `src/` directory. `poetry` is used to simulate dependency management for the project, should the `src/` directory be used directly.
 
 # 7. References
 1. Wu, X., Sun, K., Zhu, F., Zhao, R., & Li, H. (2023). Human Preference Score: Better Aligning Text-to-Image Models with Human Preference. ArXiv. https://arxiv.org/abs/2303.14420
