@@ -51,7 +51,7 @@ This section presents the numerical results of the experiments. Please see the n
 ### Attack Results
 This sub-section presents the results of the attack experiments. Each entry is rounded to 2 decimal places. The lowest category in each row is highlighted in bold.
 
-#### Stable Diffusion 1
+#### <u>Stable Diffusion 1</u>
 **HPSv1 Reward Model**
 <details>
 <summary>HPS Benchmark Dataset</summary>
@@ -125,7 +125,7 @@ This sub-section presents the results of the attack experiments. Each entry is r
 | SPSA           | 25.86        | 25.36      | NA         | 25.36  | 25.83 | 25.62   |
 </details>
 
-#### Stable Diffusion 2
+#### <u>Stable Diffusion 2</u>
 **HPSv1 Reward Model**
 <details>
 <summary>HPS Benchmark Dataset</summary>
@@ -199,7 +199,7 @@ This sub-section presents the results of the attack experiments. Each entry is r
 | SPSA           | NA           | 26.13      | NA         | **23.24** | 26.35  | 25.76   |
 </details>
 
-#### Stable Diffusion 3
+#### <u>Stable Diffusion 3</u>
 **HPSv1 Reward Model**
 <details>
 <summary>HPS Benchmark Dataset</summary>
