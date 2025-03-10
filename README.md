@@ -1,9 +1,7 @@
-# Reward-Model-Adversarial-Attacks
-
-## Motivation
+# Motivation
 The motivation behind this preliminary analysis is to evaluate the robustness of reward models that score text-to-image model outputs based on human preference. It examines if small adversarial perturbations can cause a high-scoring image to drop in score and whether such perturbations transfer between different reward models. It also explores which diffusion models are more prone to these attacks and investigates the underlying factors contributing to their vulnerability.
 
-## Method
+# Method
 This analysis required decisions regarding reward models, target models, datasets, and attack methods. These are described below.
 
 #### Reward Models
@@ -43,15 +41,15 @@ Since the torchattacks library[6] is designed for classification tasks using los
 - **SPSA (BB)**: The SPSA attack code was modified to support batch processing used the same reward-based modifications as FGSM and PGD.
 
 
-## Analysis
+# Analysis
 The experiment results are analyzed in the following section.
 
-## Main Results
+# Main Results
 This section 
 
-## Repository Details
+# Repository Details
 
-## References
+# References
 1. Wu, X., Sun, K., Zhu, F., Zhao, R., & Li, H. (2023). Human Preference Score: Better Aligning Text-to-Image Models with Human Preference. ArXiv. https://arxiv.org/abs/2303.14420
 2. Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., Krueger, G., & Sutskever, I. (2021). Learning Transferable Visual Models From Natural Language Supervision. ArXiv. https://arxiv.org/abs/2103.00020
 3. Wu, X., Hao, Y., Sun, K., Chen, Y., Zhu, F., Zhao, R., & Li, H. (2023). Human Preference Score v2: A Solid Benchmark for Evaluating Human Preferences of Text-to-Image Synthesis. ArXiv. https://arxiv.org/abs/2306.09341
