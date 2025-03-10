@@ -51,8 +51,8 @@ This section presents the numerical results of the experiments. Please see the n
 ### Attack Results
 This sub-section presents the results of the attack experiments. Each entry is rounded to 2 decimal places. The lowest category in each row is highlighted in bold.
 
-#### <u>Stable Diffusion 1</u>
-**HPSv1 Reward Model**
+#### Stable Diffusion 1
+<u>HPSv1 Reward Model</u>
 <details>
 <summary>HPS Benchmark Dataset</summary>
 
@@ -89,7 +89,7 @@ This sub-section presents the results of the attack experiments. Each entry is r
 </details> 
 <br />
 
-**HPSv2 Reward Model**
+<u>HPSv2 Reward Model</u>
 <details>
 <summary>HPS Benchmark Dataset</summary>
 
@@ -125,8 +125,8 @@ This sub-section presents the results of the attack experiments. Each entry is r
 | SPSA           | 25.86        | 25.36      | NA         | 25.36  | 25.83 | 25.62   |
 </details>
 
-#### <u>Stable Diffusion 2</u>
-**HPSv1 Reward Model**
+#### Stable Diffusion 2
+<u>HPSv1 Reward Model</u>
 <details>
 <summary>HPS Benchmark Dataset</summary>
 
@@ -163,7 +163,7 @@ This sub-section presents the results of the attack experiments. Each entry is r
 </details>
 <br />
 
-**HPSv2 Reward Model**
+<u>HPSv2 Reward Model</u>
 <details>
 <summary>HPS Benchmark Dataset</summary>
 
@@ -199,8 +199,8 @@ This sub-section presents the results of the attack experiments. Each entry is r
 | SPSA           | NA           | 26.13      | NA         | **23.24** | 26.35  | 25.76   |
 </details>
 
-#### <u>Stable Diffusion 3</u>
-**HPSv1 Reward Model**
+#### <u>Stable Diffusion 3
+<u>HPSv1 Reward Model</u>
 <details>
 <summary>HPS Benchmark Dataset</summary>
 
@@ -239,7 +239,7 @@ This sub-section presents the results of the attack experiments. Each entry is r
 </details>
 <br />
 
-**HPSv2 Reward Model**
+<u>HPSv2 Reward Model</u>
 <details>
 <summary>HPS Benchmark Dataset</summary>
 
@@ -275,6 +275,8 @@ This sub-section presents the results of the attack experiments. Each entry is r
 | SPSA           | NA           | 26.42      | NA         | **25.38**| 26.15  | 26.11   |
 </details>
 
+### Transfer Tests Results
+This sub-section presents the results of the transfer test experiments. Each entry is rounded to 2 decimal places. The lowest category in each row is highlighted in bold. Since the HPS benchmark dataset yielded better results than the DrawBench dataset, its adversarial images were selected for the transfer tests.
 
 # Repository Details
 
